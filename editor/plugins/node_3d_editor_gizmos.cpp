@@ -642,7 +642,7 @@ bool EditorNode3DGizmo::intersect_ray(Camera3D *p_camera, const Point2 &p_point,
 		Transform3D orig_camera_transform = p_camera->get_camera_transform();
 
 		if (!orig_camera_transform.origin.is_equal_approx(t.origin) &&
-				ABS(orig_camera_transform.basis.get_column(Vector3::AXIS_Z).dot(Vector3(0, 1, 0))) < 0.99) {
+			ABS(orig_camera_transform.basis.get_column(Vector3::AXIS_Z).dot(Vector3(0, 1, 0))) < 0.99) {
 			p_camera->look_at(t.origin);
 		}
 
@@ -695,7 +695,6 @@ bool EditorNode3DGizmo::intersect_ray(Camera3D *p_camera, const Point2 &p_point,
 				if (d > 0) {
 					float d2 = s[0].distance_to(p) / d;
 					tcp = a + (b - a) * d2;
-
 				} else {
 					tcp = a;
 				}
@@ -844,6 +843,9 @@ EditorNode3DGizmo::EditorNode3DGizmo() {
 	spatial_node = nullptr;
 	gizmo_plugin = nullptr;
 	selectable_icon_size = -1.0f;
+	EDITOR_DEF("editors/3d_gizmos/unselected_opacity", 0.3f);
+	EDITOR_DEF("editors/3d_gizmos/use_selection_color", false);
+	EDITOR_DEF("editors/3d_gizmos/selected_color", Color(1.0f,0.75f,0.5f));
 }
 
 EditorNode3DGizmo::~EditorNode3DGizmo() {
@@ -868,8 +870,14 @@ void EditorNode3DGizmoPlugin::create_material(const String &p_name, const Color 
 
 		Color color = instantiated ? instantiated_color : p_color;
 
+		const bool use_select_color = EDITOR_GET("editors/3d_gizmos/use_selection_color");
+
 		if (!selected) {
-			color.a *= 0.3;
+			const float unselect_opacity = EDITOR_GET("editors/3d_gizmos/unselected_opacity");
+			color.a *= unselect_opacity;
+		} else if (use_select_color) {
+			const Color select_color = EDITOR_GET("editors/3d_gizmos/selected_color");
+			color = select_color;
 		}
 
 		material->set_albedo(color);
