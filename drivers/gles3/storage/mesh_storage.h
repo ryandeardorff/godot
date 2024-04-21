@@ -586,6 +586,18 @@ public:
 	_FORCE_INLINE_ bool skeleton_is_valid(RID p_skeleton) {
 		return skeleton_owner.get_or_null(p_skeleton) != nullptr;
 	}
+
+	//TODO: If vertex color is wanted in gles3 this needs to be added
+	// If there's a better way to split functionality across forward+ and gles, this also might be worth swapping to that method.
+	RID vertexcolordata_allocate() override { return RID(); }
+
+	void vertexcolordata_initialize(RID p_rid) override { }
+
+	void vertexcolordata_free(RID p_rid) override { }
+
+	void vertexcolordata_get(RID p_rid, PackedColorArray &out) override { }
+
+	void vertexcolordata_set(RID p_rid, PackedColorArray const &colors) override { }
 };
 
 } // namespace GLES3

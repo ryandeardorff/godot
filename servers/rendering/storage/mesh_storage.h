@@ -134,6 +134,14 @@ public:
 	virtual void skeleton_set_base_transform_2d(RID p_skeleton, const Transform2D &p_base_transform) = 0;
 
 	virtual void skeleton_update_dependency(RID p_base, DependencyTracker *p_instance) = 0;
+
+	/* VERTEXCOLOR API */
+
+	virtual RID vertexcolordata_allocate() = 0;
+	virtual void vertexcolordata_initialize(RID p_rid) = 0;
+	virtual void vertexcolordata_free(RID p_rid) = 0;
+	virtual void vertexcolordata_set(RID p_rid, PackedColorArray const & colors) = 0;
+	virtual void vertexcolordata_get(RID p_rid, PackedColorArray &out) = 0;
 };
 
 #endif // MESH_STORAGE_H

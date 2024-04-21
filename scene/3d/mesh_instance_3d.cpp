@@ -34,6 +34,7 @@
 #include "physics_body_3d.h"
 #include "scene/resources/concave_polygon_shape_3d.h"
 #include "scene/resources/convex_polygon_shape_3d.h"
+#include "scene/resources/vertexcolor_data.h"
 
 bool MeshInstance3D::_set(const StringName &p_name, const Variant &p_value) {
 	//this is not _too_ bad performance wise, really. it only arrives here if the property was not set anywhere else.
@@ -190,6 +191,15 @@ void MeshInstance3D::_resolve_skeleton_path() {
 	}
 }
 
+void MeshInstance3D::_resolve_vertexcolor() {
+	if (!vertexcolor.is_null()) {
+		RS::get_singleton()->instance_attach_vertexcolor(get_instance(), vertexcolor.ptr()->get_rid());
+	}
+	else {
+		RS::get_singleton()->instance_attach_vertexcolor(get_instance(), RID());
+	}
+}
+
 void MeshInstance3D::set_skin(const Ref<Skin> &p_skin) {
 	skin_internal = p_skin;
 	skin = p_skin;
@@ -230,6 +240,24 @@ void MeshInstance3D::set_usevertexcolor(bool use_vertex_color) {
 bool MeshInstance3D::get_usevertexcolor() const {
 	return use_vertexcolor;
 }
+
+void MeshInstance3D::set_vertexcolor(const Ref<VertexColorData> &p_vertexcolor) {
+	if (vertexcolor == p_vertexcolor) return;
+	if (!vertexcolor.is_null()) {
+		vertexcolor.ptr()->disconnect_changed(callable_mp(this, &MeshInstance3D::_resolve_vertexcolor));
+	}
+	if (!p_vertexcolor.is_null()) {
+		vertexcolor = p_vertexcolor;
+		vertexcolor.ptr()->connect_changed(callable_mp(this, &MeshInstance3D::_resolve_vertexcolor));
+	}
+	vertexcolor = p_vertexcolor;
+	_resolve_vertexcolor();
+}
+
+Ref<VertexColorData> MeshInstance3D::get_vertexcolor() const {
+	return vertexcolor;
+}
+
 
 Node *MeshInstance3D::create_trimesh_collision_node() {
 	if (mesh.is_null()) {
@@ -510,6 +538,8 @@ void MeshInstance3D::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_skin"), &MeshInstance3D::get_skin);
 	ClassDB::bind_method(D_METHOD("set_usevertexcolor", "use_vertex_color"), &MeshInstance3D::set_usevertexcolor);
 	ClassDB::bind_method(D_METHOD("get_usevertexcolor"), &MeshInstance3D::get_usevertexcolor);
+	ClassDB::bind_method(D_METHOD("set_vertexcolor", "p_vertexcolor"), &MeshInstance3D::set_vertexcolor);
+	ClassDB::bind_method(D_METHOD("get_vertexcolor"), &MeshInstance3D::get_vertexcolor);
 
 	ClassDB::bind_method(D_METHOD("get_surface_override_material_count"), &MeshInstance3D::get_surface_override_material_count);
 	ClassDB::bind_method(D_METHOD("set_surface_override_material", "surface", "material"), &MeshInstance3D::set_surface_override_material);
@@ -533,9 +563,10 @@ void MeshInstance3D::_bind_methods() {
 	ADD_GROUP("Skeleton", "");
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "skin", PROPERTY_HINT_RESOURCE_TYPE, "Skin"), "set_skin", "get_skin");
 	ADD_PROPERTY(PropertyInfo(Variant::NODE_PATH, "skeleton", PROPERTY_HINT_NODE_PATH_VALID_TYPES, "Skeleton3D"), "set_skeleton_path", "get_skeleton_path");
-	ADD_GROUP("", "");
-	//ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "basemesh", PROPERTY_HINT_RESOURCE_TYPE, "Mesh"), "set_mesh", "get_mesh");
+	ADD_GROUP("Vertex Color", "");
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "use_vertex_color"), "set_usevertexcolor", "get_usevertexcolor");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "vertex_colors", PROPERTY_HINT_RESOURCE_TYPE, "VertexColorData"), "set_vertexcolor", "get_vertexcolor");
+	ADD_GROUP("", "");
 }
 
 MeshInstance3D::MeshInstance3D() {

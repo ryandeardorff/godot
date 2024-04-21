@@ -276,6 +276,7 @@
 #include "scene/resources/sky_material.h"
 #include "scene/resources/sphere_shape_3d.h"
 #include "scene/resources/world_boundary_shape_3d.h"
+#include "scene/resources/vertexcolor_data.h"
 #endif // _3D_DISABLED
 
 static Ref<ResourceFormatSaverText> resource_saver_text;
@@ -546,6 +547,7 @@ void register_scene_types() {
 	GDREGISTER_CLASS(CPUParticles3D);
 	GDREGISTER_CLASS(Marker3D);
 	GDREGISTER_CLASS(RootMotionView);
+	GDREGISTER_CLASS(VertexColorData);
 
 	OS::get_singleton()->yield(); // may take time to init
 

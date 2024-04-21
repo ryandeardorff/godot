@@ -360,6 +360,11 @@ public:
 	FUNC2RC(Transform2D, skeleton_bone_get_transform_2d, RID, int)
 	FUNC2(skeleton_set_base_transform_2d, RID, const Transform2D &)
 
+	/* VERTEXCOLOR API */
+	FUNCRIDSPLIT(vertexcolordata)
+	FUNC2(vertexcolordata_set, RID, PackedColorArray const&)
+	FUNC2(vertexcolordata_get, RID, PackedColorArray &)
+
 	/* Light API */
 #undef ServerName
 #undef server_name
@@ -786,6 +791,8 @@ public:
 	FUNC3(instance_set_blend_shape_weight, RID, int, float)
 	FUNC3(instance_set_surface_override_material, RID, int, RID)
 	FUNC2(instance_set_visible, RID, bool)
+
+	FUNC2(instance_attach_vertexcolor, RID, RID)
 
 	FUNC2(instance_set_custom_aabb, RID, AABB)
 

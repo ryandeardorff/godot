@@ -390,6 +390,8 @@ public:
 
 		RID mesh_instance; //only used for meshes and when skeleton/blendshapes exist
 
+		RID vertexcolors;
+
 		Transform3D transform;
 
 		float lod_bias;
@@ -969,6 +971,8 @@ public:
 	virtual void instance_set_surface_override_material(RID p_instance, int p_surface, RID p_material);
 	virtual void instance_set_visible(RID p_instance, bool p_visible);
 	virtual void instance_geometry_set_transparency(RID p_instance, float p_transparency);
+
+	virtual void instance_attach_vertexcolor(RID p_instance, RID p_vertexcolor) override;
 
 	virtual void instance_set_custom_aabb(RID p_instance, AABB p_aabb);
 

@@ -215,11 +215,11 @@ struct InstanceData {
 	uint instance_uniforms_ofs; //base offset in global buffer for instance variables
 	uint gi_offset; //GI information when using lightmapping (VCT or lightmap index)
 	uint layer_mask;
-    uint vertexcolor_offset;
 	vec4 lightmap_uv_scale;
 	vec4 compressed_aabb_position_pad; // Only .xyz is used. .w is padding.
 	vec4 compressed_aabb_size_pad; // Only .xyz is used. .w is padding.
 	vec4 uv_scale;
+    uint vertexcolor_offset;
 };
 
 layout(set = 1, binding = 2, std430) buffer restrict readonly InstanceDataBuffer {
@@ -325,7 +325,7 @@ layout(set = 2, binding = 0, std430) restrict readonly buffer Transforms {
 transforms;
 
 layout (set = 1, binding = 21, std430) restrict readonly buffer VertexColorData {
-    vec3 data[];
+    vec4 data[];
 }
 vertexcolors;
 

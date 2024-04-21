@@ -302,21 +302,21 @@ class RenderForwardClustered : public RendererSceneRenderRD {
 		};
 
 		struct InstanceData {
-			float transform[16];
-			float prev_transform[16];
-			uint32_t flags;
-			uint32_t instance_uniforms_ofs; //base offset in global buffer for instance variables
-			uint32_t gi_offset; //GI information when using lightmapping (VCT or lightmap index)
-			uint32_t layer_mask;
-			uint32_t vertexcolor_offset;
-			float lightmap_uv_scale[4];
-			float compressed_aabb_position[4];
-			float compressed_aabb_size[4];
-			float uv_scale[4];
+			alignas(4) float transform[16];
+			alignas(4) float prev_transform[16];
+			alignas(4) uint32_t flags;
+			alignas(4) uint32_t instance_uniforms_ofs; //base offset in global buffer for instance variables
+			alignas(4) uint32_t gi_offset; //GI information when using lightmapping (VCT or lightmap index)
+			alignas(4) uint32_t layer_mask;
+			alignas(4) float lightmap_uv_scale[4];
+			alignas(4) float compressed_aabb_position[4];
+			alignas(4) float compressed_aabb_size[4];
+			alignas(4) float uv_scale[4];
+			alignas(16) uint32_t vertxcolor_offset;
 		};
 
 		struct VertexColorData {
-			float color[3];
+			Color color;
 		};
 
 		UBO ubo;

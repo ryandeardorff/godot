@@ -80,6 +80,8 @@ public:
 	virtual void instance_set_visible(RID p_instance, bool p_visible) = 0;
 	virtual void instance_geometry_set_transparency(RID p_instance, float p_transparency) = 0;
 
+	virtual void instance_attach_vertexcolor(RID p_instance, RID p_vertexcolor) = 0;
+
 	virtual void instance_set_custom_aabb(RID p_instance, AABB p_aabb) = 0;
 
 	virtual void instance_attach_skeleton(RID p_instance, RID p_skeleton) = 0;

@@ -764,6 +764,21 @@ public:
 
 		return skeleton->uniform_set_3d;
 	}
+
+
+private:
+	struct VertexColorData {
+		PackedColorArray colors;
+	};
+	mutable RID_Owner<VertexColorData,true> vertexcolordata_owner;
+public:
+	bool owns_vertexcolordata(RID p_rid) const { return vertexcolordata_owner.owns(p_rid); };
+
+	virtual RID vertexcolordata_allocate() override;
+	void vertexcolordata_initialize(RID p_rid) override;
+	void vertexcolordata_free(RID p_rid) override;
+	void vertexcolordata_set(RID p_rid, PackedColorArray const & colors) override;
+	void vertexcolordata_get(RID p_rid, PackedColorArray &out) override;
 };
 
 } // namespace RendererRD

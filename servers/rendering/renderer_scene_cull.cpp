@@ -481,6 +481,8 @@ void RendererSceneCull::instance_initialize(RID p_rid) {
 
 void RendererSceneCull::_instance_update_mesh_instance(Instance *p_instance) {
 	bool needs_instance = RSG::mesh_storage->mesh_needs_instance(p_instance->base, p_instance->skeleton.is_valid());
+	InstanceGeometryData *geom = static_cast<InstanceGeometryData *>(p_instance->base_data);
+	geom->geometry_instance->set_vertexcolor(p_instance->vertexcolors);
 	if (needs_instance != p_instance->mesh_instance.is_valid()) {
 		if (needs_instance) {
 			p_instance->mesh_instance = RSG::mesh_storage->mesh_instance_create(p_instance->base);
@@ -669,6 +671,7 @@ void RendererSceneCull::instance_set_base(RID p_instance, RID p_base) {
 				geom->geometry_instance->set_use_lightmap(RID(), instance->lightmap_uv_scale, instance->lightmap_slice_index);
 				geom->geometry_instance->set_instance_shader_uniforms_offset(instance->instance_allocated_shader_uniforms_offset);
 				geom->geometry_instance->set_cast_double_sided_shadows(instance->cast_shadows == RS::SHADOW_CASTING_SETTING_DOUBLE_SIDED);
+				geom->geometry_instance->set_vertexcolor(instance->vertexcolors);
 				if (instance->lightmap_sh.size() == 9) {
 					geom->geometry_instance->set_lightmap_capture(instance->lightmap_sh.ptr());
 				}
@@ -905,6 +908,18 @@ void RendererSceneCull::instance_geometry_set_transparency(RID p_instance, float
 		ERR_FAIL_NULL(geom->geometry_instance);
 		geom->geometry_instance->set_transparency(p_transparency);
 	}
+}
+
+void RendererSceneCull::instance_attach_vertexcolor(RID p_instance, RID p_vertexcolor) {
+	Instance *instance = instance_owner.get_or_null(p_instance);
+	ERR_FAIL_NULL(instance);
+
+	if (instance->vertexcolors == p_vertexcolor) {
+		return;
+	}
+
+	instance->vertexcolors = p_vertexcolor;
+	_instance_queue_update(instance, true);
 }
 
 void RendererSceneCull::instance_set_transform(RID p_instance, const Transform3D &p_transform) {

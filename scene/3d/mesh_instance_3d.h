@@ -33,6 +33,8 @@
 
 #include "core/templates/local_vector.h"
 #include "scene/3d/visual_instance_3d.h"
+
+class VertexColorData;
 class Skin;
 class SkinReference;
 
@@ -45,6 +47,7 @@ protected:
 	Ref<Skin> skin_internal;
 	Ref<SkinReference> skin_ref;
 	NodePath skeleton_path = NodePath("..");
+	Ref<VertexColorData> vertexcolor;
 
 	bool use_vertexcolor = false;
 
@@ -54,6 +57,7 @@ protected:
 
 	void _mesh_changed();
 	void _resolve_skeleton_path();
+	void _resolve_vertexcolor();
 
 protected:
 	bool _set(const StringName &p_name, const Variant &p_value);
@@ -100,6 +104,9 @@ public:
 
 	void set_usevertexcolor(bool use_vertex_color);
 	bool get_usevertexcolor() const;
+
+	void set_vertexcolor(const Ref<VertexColorData> & p_vertexcolor);
+	Ref<VertexColorData> get_vertexcolor() const;
 
 	MeshInstance3D();
 	~MeshInstance3D();

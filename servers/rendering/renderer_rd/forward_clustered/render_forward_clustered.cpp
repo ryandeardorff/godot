@@ -31,6 +31,7 @@
 #include "render_forward_clustered.h"
 #include "core/config/project_settings.h"
 #include "core/object/worker_thread_pool.h"
+#include "scene/resources/vertexcolor_data.h"
 #include "servers/rendering/renderer_rd/framebuffer_cache_rd.h"
 #include "servers/rendering/renderer_rd/renderer_compositor_rd.h"
 #include "servers/rendering/renderer_rd/storage_rd/light_storage.h"
@@ -707,7 +708,8 @@ void RenderForwardClustered::_fill_instance_data(RenderListType p_render_list, i
 
 	scene_state.instance_data[p_render_list].resize(p_offset + element_total);
 	rl->element_info.resize(p_offset + element_total);
-	scene_state.vertexcolor_data.resize(p_offset + element_total);
+	//TODO: see if there is a better metric for what to resize this to, rather than just the # of instances or 0
+	scene_state.vertexcolor_data.clear();
 
 	if (p_render_info) {
 		p_render_info[RS::VIEWPORT_RENDER_INFO_OBJECTS_IN_FRAME] += element_total;
@@ -715,6 +717,7 @@ void RenderForwardClustered::_fill_instance_data(RenderListType p_render_list, i
 	uint64_t frame = RSG::rasterizer->get_frame_number();
 	uint32_t repeats = 0;
 	GeometryInstanceSurfaceDataCache *prev_surface = nullptr;
+	uint32_t coloroffset = 0;
 	for (uint32_t i = 0; i < element_total; i++) {
 		GeometryInstanceSurfaceDataCache *surface = rl->elements[i + p_offset];
 		GeometryInstanceForwardClustered *inst = surface->owner;
@@ -803,6 +806,26 @@ void RenderForwardClustered::_fill_instance_data(RenderListType p_render_list, i
 		} else {
 			prev_surface = surface;
 		}
+
+		if (p_render_list != RENDER_LIST_OPAQUE)
+			continue;
+
+		RID p_vertexcolor = inst->data->vertexcolor;
+		if (p_vertexcolor.is_null()) {
+			// TODO: Move instance data flag setting logic into initial setting of flag rather than here
+			instance_data.flags &= ~INSTANCE_DATA_FLAG_USE_VERTEXCOLOR;
+		}
+		else {
+			instance_data.flags |= INSTANCE_DATA_FLAG_USE_VERTEXCOLOR;
+			instance_data.vertxcolor_offset = coloroffset;
+			PackedColorArray colors;
+			RS::get_singleton()->vertexcolordata_get(p_vertexcolor, colors);
+			for (Color const &color : colors) {
+				scene_state.vertexcolor_data.push_back(SceneState::VertexColorData{ color });
+				coloroffset+=1;
+			}
+			// coloroffset += RendererRD::MeshStorage::get_singleton()->mesh_surface_get_vertices_drawn_count(surface->surface);
+		}
 	}
 
 	if (repeats > 0) {
@@ -874,6 +897,9 @@ void RenderForwardClustered::_fill_render_list(RenderListType p_render_list, con
 
 		if (inst->non_uniform_scale) {
 			flags |= INSTANCE_DATA_FLAGS_NON_UNIFORM_SCALE;
+		}
+		if (inst->use_vertexcolor) {
+			flags |= INSTANCE_DATA_FLAG_USE_VERTEXCOLOR;
 		}
 		bool uses_lightmap = false;
 		bool uses_gi = false;

@@ -435,6 +435,11 @@ public:
 	virtual Transform2D skeleton_bone_get_transform_2d(RID p_skeleton, int p_bone) const = 0;
 	virtual void skeleton_set_base_transform_2d(RID p_skeleton, const Transform2D &p_base_transform) = 0;
 
+	/* VERTEXCOLOR API */
+	virtual RID vertexcolordata_create() = 0;
+	virtual void vertexcolordata_set(RID p_vertexcolordata, PackedColorArray const & colors) = 0;
+	virtual void vertexcolordata_get(RID p_vertexcolordata, PackedColorArray & colors) = 0;
+
 	/* Light API */
 
 	enum LightType {
@@ -1260,6 +1265,8 @@ public:
 	virtual void instance_set_blend_shape_weight(RID p_instance, int p_shape, float p_weight) = 0;
 	virtual void instance_set_surface_override_material(RID p_instance, int p_surface, RID p_material) = 0;
 	virtual void instance_set_visible(RID p_instance, bool p_visible) = 0;
+
+	virtual void instance_attach_vertexcolor(RID p_instance, RID p_vertexcolor) = 0;
 
 	virtual void instance_set_custom_aabb(RID p_instance, AABB aabb) = 0;
 

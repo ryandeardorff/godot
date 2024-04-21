@@ -97,7 +97,7 @@ layout(location = 2) out vec4 color_interp;
 #endif
 
 #if defined(VERTEXCOLOR_USED)
-layout(location=12) out vec3 vertexcolor_interp;
+layout(location=12) out vec4 vertexcolor_interp;
 #endif
 
 #ifdef UV_USED
@@ -212,7 +212,12 @@ void vertex_shader(vec3 vertex_input,
 #endif
 
 #if defined(VERTEXCOLOR_USED)
-    vertexcolor_interp = vec3(1.0);
+//    if (bool(instances.data[instance_index].flags & INSTANCE_FLAGS_USE_VERTEXCOLOR)){
+        uint offset = instances.data[instance_index].vertexcolor_offset + uint(gl_VertexIndex);
+        vertexcolor_interp = vertexcolors.data[offset];
+//    } else {
+//        vertexcolor_interp = vec4(1.0f);
+//    }
 #endif
 
 	mat3 model_normal_matrix;
@@ -677,7 +682,7 @@ layout(location = 2) in vec4 color_interp;
 #endif
 
 #if defined(VERTEXCOLOR_USED)
-layout(location = 12) in vec3 vertexcolor_interp;
+layout(location = 12) in vec4 vertexcolor_interp;
 #endif
 
 #ifdef UV_USED

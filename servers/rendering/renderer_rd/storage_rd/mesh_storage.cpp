@@ -209,6 +209,8 @@ bool MeshStorage::free(RID p_rid) {
 	} else if (owns_skeleton(p_rid)) {
 		skeleton_free(p_rid);
 		return true;
+	} else if (owns_vertexcolordata(p_rid)) {
+		vertexcolordata_free(p_rid);
 	}
 
 	return false;
@@ -2275,6 +2277,31 @@ void MeshStorage::_update_dirty_skeletons() {
 	}
 
 	skeleton_dirty_list = nullptr;
+}
+
+RID MeshStorage::vertexcolordata_allocate() {
+	return vertexcolordata_owner.allocate_rid();
+}
+
+void MeshStorage::vertexcolordata_initialize(RID p_rid) {
+	vertexcolordata_owner.initialize_rid(p_rid);
+}
+
+void MeshStorage::vertexcolordata_free(RID p_rid) {
+	vertexcolordata_owner.free(p_rid);
+}
+
+void MeshStorage::vertexcolordata_set(RID p_rid, PackedColorArray const &colors) {
+	VertexColorData *data = vertexcolordata_owner.get_or_null(p_rid);
+	ERR_FAIL_NULL(data);
+
+	data->colors = colors;
+}
+
+void MeshStorage::vertexcolordata_get(RID p_rid, PackedColorArray &out) {
+	VertexColorData *data = vertexcolordata_owner.get_or_null(p_rid);
+	ERR_FAIL_NULL(data);
+	out = data->colors;
 }
 
 void MeshStorage::skeleton_update_dependency(RID p_skeleton, DependencyTracker *p_instance) {

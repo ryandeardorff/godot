@@ -134,6 +134,12 @@ void RenderGeometryInstanceBase::set_cast_double_sided_shadows(bool p_enable) {
 	_mark_dirty();
 }
 
+void RenderGeometryInstanceBase::set_vertexcolor(RID p_vertexcolor) {
+	data->vertexcolor = p_vertexcolor;
+	_mark_dirty();
+	data->dirty_dependencies = true;
+}
+
 Transform3D RenderGeometryInstanceBase::get_transform() {
 	return transform;
 }
