@@ -46,6 +46,8 @@ protected:
 	Ref<SkinReference> skin_ref;
 	NodePath skeleton_path = NodePath("..");
 
+	bool use_vertexcolor = false;
+
 	LocalVector<float> blend_shape_tracks;
 	HashMap<StringName, int> blend_shape_properties;
 	Vector<Ref<Material>> surface_override_materials;
@@ -95,6 +97,9 @@ public:
 	void create_debug_tangents();
 
 	virtual AABB get_aabb() const override;
+
+	void set_usevertexcolor(bool use_vertex_color);
+	bool get_usevertexcolor() const;
 
 	MeshInstance3D();
 	~MeshInstance3D();

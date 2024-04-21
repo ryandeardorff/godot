@@ -223,6 +223,14 @@ AABB MeshInstance3D::get_aabb() const {
 	return AABB();
 }
 
+void MeshInstance3D::set_usevertexcolor(bool use_vertex_color) {
+	use_vertexcolor = use_vertex_color;
+}
+
+bool MeshInstance3D::get_usevertexcolor() const {
+	return use_vertexcolor;
+}
+
 Node *MeshInstance3D::create_trimesh_collision_node() {
 	if (mesh.is_null()) {
 		return nullptr;
@@ -500,6 +508,8 @@ void MeshInstance3D::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_skeleton_path"), &MeshInstance3D::get_skeleton_path);
 	ClassDB::bind_method(D_METHOD("set_skin", "skin"), &MeshInstance3D::set_skin);
 	ClassDB::bind_method(D_METHOD("get_skin"), &MeshInstance3D::get_skin);
+	ClassDB::bind_method(D_METHOD("set_usevertexcolor", "use_vertex_color"), &MeshInstance3D::set_usevertexcolor);
+	ClassDB::bind_method(D_METHOD("get_usevertexcolor"), &MeshInstance3D::get_usevertexcolor);
 
 	ClassDB::bind_method(D_METHOD("get_surface_override_material_count"), &MeshInstance3D::get_surface_override_material_count);
 	ClassDB::bind_method(D_METHOD("set_surface_override_material", "surface", "material"), &MeshInstance3D::set_surface_override_material);
@@ -524,6 +534,8 @@ void MeshInstance3D::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "skin", PROPERTY_HINT_RESOURCE_TYPE, "Skin"), "set_skin", "get_skin");
 	ADD_PROPERTY(PropertyInfo(Variant::NODE_PATH, "skeleton", PROPERTY_HINT_NODE_PATH_VALID_TYPES, "Skeleton3D"), "set_skeleton_path", "get_skeleton_path");
 	ADD_GROUP("", "");
+	//ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "basemesh", PROPERTY_HINT_RESOURCE_TYPE, "Mesh"), "set_mesh", "get_mesh");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "use_vertex_color"), "set_usevertexcolor", "get_usevertexcolor");
 }
 
 MeshInstance3D::MeshInstance3D() {

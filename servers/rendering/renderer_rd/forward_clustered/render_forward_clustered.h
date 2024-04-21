@@ -80,7 +80,8 @@ class RenderForwardClustered : public RendererSceneRenderRD {
 		MAX_VOXEL_GI_INSTANCESS = 8,
 		MAX_LIGHTMAPS = 8,
 		MAX_VOXEL_GI_INSTANCESS_PER_INSTANCE = 2,
-		INSTANCE_DATA_BUFFER_MIN_SIZE = 4096
+		INSTANCE_DATA_BUFFER_MIN_SIZE = 4096,
+		VERTEXCOLOR_DATA_BUFFER_MIN_SIZE = 2048
 	};
 
 	enum RenderListType {
@@ -259,6 +260,7 @@ class RenderForwardClustered : public RendererSceneRenderRD {
 		INSTANCE_DATA_FLAG_MULTIMESH_FORMAT_2D = 1 << 13,
 		INSTANCE_DATA_FLAG_MULTIMESH_HAS_COLOR = 1 << 14,
 		INSTANCE_DATA_FLAG_MULTIMESH_HAS_CUSTOM_DATA = 1 << 15,
+		INSTANCE_DATA_FLAG_USE_VERTEXCOLOR = 1 << 16,
 		INSTANCE_DATA_FLAGS_PARTICLE_TRAIL_SHIFT = 16,
 		INSTANCE_DATA_FLAGS_PARTICLE_TRAIL_MASK = 0xFF,
 		INSTANCE_DATA_FLAGS_FADE_SHIFT = 24,
@@ -306,10 +308,15 @@ class RenderForwardClustered : public RendererSceneRenderRD {
 			uint32_t instance_uniforms_ofs; //base offset in global buffer for instance variables
 			uint32_t gi_offset; //GI information when using lightmapping (VCT or lightmap index)
 			uint32_t layer_mask;
+			uint32_t vertexcolor_offset;
 			float lightmap_uv_scale[4];
 			float compressed_aabb_position[4];
 			float compressed_aabb_size[4];
 			float uv_scale[4];
+		};
+
+		struct VertexColorData {
+			float color[3];
 		};
 
 		UBO ubo;
@@ -327,6 +334,10 @@ class RenderForwardClustered : public RendererSceneRenderRD {
 		RID instance_buffer[RENDER_LIST_MAX];
 		uint32_t instance_buffer_size[RENDER_LIST_MAX] = { 0, 0, 0 };
 		LocalVector<InstanceData> instance_data[RENDER_LIST_MAX];
+
+		RID vertexcolor_buffer;
+		uint32_t vertexcolor_buffer_size = 0;
+		LocalVector<VertexColorData> vertexcolor_data;
 
 		LightmapCaptureData *lightmap_captures = nullptr;
 		uint32_t max_lightmap_captures;
@@ -392,6 +403,8 @@ class RenderForwardClustered : public RendererSceneRenderRD {
 	void _update_instance_data_buffer(RenderListType p_render_list);
 	void _fill_instance_data(RenderListType p_render_list, int *p_render_info = nullptr, uint32_t p_offset = 0, int32_t p_max_elements = -1, bool p_update_buffer = true);
 	void _fill_render_list(RenderListType p_render_list, const RenderDataRD *p_render_data, PassMode p_pass_mode, bool p_using_sdfgi = false, bool p_using_opaque_gi = false, bool p_using_motion_pass = false, bool p_append = false);
+
+	void _update_vertexcolor_data_buffer();
 
 	HashMap<Size2i, RID> sdfgi_framebuffer_size_cache;
 
@@ -467,6 +480,9 @@ class RenderForwardClustered : public RendererSceneRenderRD {
 		uint32_t lightmap_slice_index;
 		GeometryInstanceLightmapSH *lightmap_sh = nullptr;
 
+		// Vertex color
+		bool use_vertexcolor = false;
+		uint32_t vertexcolor_offset = 0;
 		//used during rendering
 
 		uint32_t gi_offset_cache = 0;

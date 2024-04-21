@@ -707,6 +707,7 @@ void RenderForwardClustered::_fill_instance_data(RenderListType p_render_list, i
 
 	scene_state.instance_data[p_render_list].resize(p_offset + element_total);
 	rl->element_info.resize(p_offset + element_total);
+	scene_state.vertexcolor_data.resize(p_offset + element_total);
 
 	if (p_render_info) {
 		p_render_info[RS::VIEWPORT_RENDER_INFO_OBJECTS_IN_FRAME] += element_total;
@@ -812,6 +813,7 @@ void RenderForwardClustered::_fill_instance_data(RenderListType p_render_list, i
 
 	if (p_update_buffer) {
 		_update_instance_data_buffer(p_render_list);
+		_update_vertexcolor_data_buffer();
 	}
 }
 
@@ -1096,6 +1098,21 @@ void RenderForwardClustered::_fill_render_list(RenderListType p_render_list, con
 
 	if (p_render_list == RENDER_LIST_OPAQUE && lightmap_captures_used) {
 		RD::get_singleton()->buffer_update(scene_state.lightmap_capture_buffer, 0, sizeof(LightmapCaptureData) * lightmap_captures_used, scene_state.lightmap_captures, RD::BARRIER_MASK_RASTER);
+	}
+}
+
+void RenderForwardClustered::_update_vertexcolor_data_buffer() {
+	// create or update/resize vertexcolor data buffer, similar to Instance Data buffer.
+	if (scene_state.vertexcolor_data.size() > 0) {
+		if (scene_state.vertexcolor_buffer == RID() || scene_state.vertexcolor_buffer_size < scene_state.vertexcolor_data.size()) {
+			if (scene_state.vertexcolor_buffer != RID()) {
+				RD::get_singleton()->free(scene_state.vertexcolor_buffer);
+			}
+			uint32_t new_size = nearest_power_of_2_templated(MAX(uint64_t(VERTEXCOLOR_DATA_BUFFER_MIN_SIZE), scene_state.vertexcolor_data.size()));
+			scene_state.vertexcolor_buffer = RD::get_singleton()->storage_buffer_create(new_size * sizeof(SceneState::VertexColorData));
+			scene_state.vertexcolor_buffer_size = new_size;
+		}
+		RD::get_singleton()->buffer_update(scene_state.vertexcolor_buffer, 0, sizeof(SceneState::VertexColorData) * scene_state.vertexcolor_data.size(), scene_state.vertexcolor_data.ptr(), RD::BARRIER_MASK_RASTER);
 	}
 }
 
@@ -1400,6 +1417,9 @@ void RenderForwardClustered::_pre_opaque_render(RenderDataRD *p_render_data, boo
 	p_render_data->cube_shadows.clear();
 	p_render_data->shadows.clear();
 	p_render_data->directional_shadows.clear();
+
+	// update vertex color
+	_update_vertexcolor_data_buffer();
 
 	Plane camera_plane(-p_render_data->scene_data->cam_transform.basis.get_column(Vector3::AXIS_Z), p_render_data->scene_data->cam_transform.origin);
 	float lod_distance_multiplier = p_render_data->scene_data->cam_projection.get_lod_multiplier();
@@ -1930,6 +1950,7 @@ void RenderForwardClustered::_render_scene(RenderDataRD *p_render_data, const Co
 
 		RD::get_singleton()->draw_command_begin_label("Render Depth Pre-Pass");
 
+		//TODO: INVESTIGATE HERE if this should be null
 		RID rp_uniform_set = _setup_render_pass_uniform_set(RENDER_LIST_OPAQUE, nullptr, RID());
 
 		bool finish_depth = using_ssao || using_ssil || using_sdfgi || using_voxelgi;
@@ -3320,6 +3341,18 @@ RID RenderForwardClustered::_setup_render_pass_uniform_set(RenderListType p_rend
 		u.append_id(texture);
 		uniforms.push_back(u);
 	}
+	{
+		// Vertex color uniform storage buffer
+		RD::Uniform u;
+		u.binding = 21;
+		u.uniform_type = RD::UNIFORM_TYPE_STORAGE_BUFFER;
+		RID vcolorstore = scene_state.vertexcolor_buffer;
+		if (vcolorstore == RID()) {
+			vcolorstore = scene_shader.default_vec4_xform_buffer; // any buffer will do since its not used
+		}
+		u.append_id(vcolorstore);
+		uniforms.push_back(u);
+	}
 
 	return UniformSetCacheRD::get_singleton()->get_cache_vec(scene_shader.default_shader_rd, RENDER_PASS_UNIFORM_SET, uniforms);
 }
@@ -3458,6 +3491,17 @@ RID RenderForwardClustered::_setup_sdfgi_render_pass_uniform_set(RID p_albedo_te
 		u.uniform_type = RD::UNIFORM_TYPE_IMAGE;
 		u.binding = 13;
 		u.append_id(p_geom_facing_texture);
+		uniforms.push_back(u);
+	}
+	{
+		RD::Uniform u;
+		u.binding = 21;
+		u.uniform_type = RD::UNIFORM_TYPE_STORAGE_BUFFER;
+		RID vertexcolor_buffer = scene_state.vertexcolor_buffer;
+		if (vertexcolor_buffer == RID()) {
+			vertexcolor_buffer = scene_shader.default_vec4_xform_buffer; // any buffer will do since its not used
+		}
+		u.append_id(vertexcolor_buffer);
 		uniforms.push_back(u);
 	}
 
@@ -4211,6 +4255,7 @@ RenderForwardClustered::~RenderForwardClustered() {
 		for (const RID &rid : scene_state.uniform_buffers) {
 			RD::get_singleton()->free(rid);
 		}
+		RD::get_singleton()->free(scene_state.vertexcolor_buffer);
 		for (const RID &rid : scene_state.implementation_uniform_buffers) {
 			RD::get_singleton()->free(rid);
 		}

@@ -66,6 +66,7 @@ layout(set = 0, binding = 4) uniform sampler light_projector_sampler;
 #define INSTANCE_FLAGS_MULTIMESH_FORMAT_2D (1 << 13)
 #define INSTANCE_FLAGS_MULTIMESH_HAS_COLOR (1 << 14)
 #define INSTANCE_FLAGS_MULTIMESH_HAS_CUSTOM_DATA (1 << 15)
+#define INSTANCE_FLAGS_USE_VERTEXCOLOR (1<<16)
 #define INSTANCE_FLAGS_PARTICLE_TRAIL_SHIFT 16
 #define INSTANCE_FLAGS_FADE_SHIFT 24
 //3 bits of stride
@@ -214,6 +215,7 @@ struct InstanceData {
 	uint instance_uniforms_ofs; //base offset in global buffer for instance variables
 	uint gi_offset; //GI information when using lightmapping (VCT or lightmap index)
 	uint layer_mask;
+    uint vertexcolor_offset;
 	vec4 lightmap_uv_scale;
 	vec4 compressed_aabb_position_pad; // Only .xyz is used. .w is padding.
 	vec4 compressed_aabb_size_pad; // Only .xyz is used. .w is padding.
@@ -321,5 +323,12 @@ layout(set = 2, binding = 0, std430) restrict readonly buffer Transforms {
 	vec4 data[];
 }
 transforms;
+
+layout (set = 1, binding = 21, std430) restrict readonly buffer VertexColorData {
+    vec3 data[];
+}
+vertexcolors;
+
+
 
 /* Set 3 User Material */

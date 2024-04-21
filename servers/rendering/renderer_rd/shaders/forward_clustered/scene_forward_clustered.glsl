@@ -96,6 +96,10 @@ layout(location = 1) out vec3 normal_interp;
 layout(location = 2) out vec4 color_interp;
 #endif
 
+#if defined(VERTEXCOLOR_USED)
+layout(location=12) out vec3 vertexcolor_interp;
+#endif
+
 #ifdef UV_USED
 layout(location = 3) out vec2 uv_interp;
 #endif
@@ -205,6 +209,10 @@ void vertex_shader(vec3 vertex_input,
 	inv_view_matrix[0][3] = 0.0;
 	inv_view_matrix[1][3] = 0.0;
 	inv_view_matrix[2][3] = 0.0;
+#endif
+
+#if defined(VERTEXCOLOR_USED)
+    vertexcolor_interp = vec3(1.0);
 #endif
 
 	mat3 model_normal_matrix;
@@ -666,6 +674,10 @@ layout(location = 1) in vec3 normal_interp;
 
 #if defined(COLOR_USED)
 layout(location = 2) in vec4 color_interp;
+#endif
+
+#if defined(VERTEXCOLOR_USED)
+layout(location = 12) in vec3 vertexcolor_interp;
 #endif
 
 #ifdef UV_USED
