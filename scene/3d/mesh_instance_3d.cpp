@@ -242,6 +242,7 @@ bool MeshInstance3D::get_usevertexcolor() const {
 }
 
 void MeshInstance3D::set_vertexcolor(const Ref<VertexColorData> &p_vertexcolor) {
+	notify_property_list_changed();
 	if (vertexcolor == p_vertexcolor) return;
 	if (!vertexcolor.is_null()) {
 		vertexcolor.ptr()->disconnect_changed(callable_mp(this, &MeshInstance3D::_resolve_vertexcolor));

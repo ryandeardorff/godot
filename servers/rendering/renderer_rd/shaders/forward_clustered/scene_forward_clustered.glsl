@@ -212,12 +212,12 @@ void vertex_shader(vec3 vertex_input,
 #endif
 
 #if defined(VERTEXCOLOR_USED)
-//    if (bool(instances.data[instance_index].flags & INSTANCE_FLAGS_USE_VERTEXCOLOR)){
+    if (bool(instances.data[instance_index].flags & INSTANCE_FLAGS_USE_VERTEXCOLOR)){
         uint offset = instances.data[instance_index].vertexcolor_offset + uint(gl_VertexIndex);
         vertexcolor_interp = vertexcolors.data[offset];
-//    } else {
-//        vertexcolor_interp = vec4(1.0f);
-//    }
+    } else {
+        vertexcolor_interp = vec4(1.0f);
+    }
 #endif
 
 	mat3 model_normal_matrix;

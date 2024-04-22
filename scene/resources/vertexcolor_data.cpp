@@ -15,6 +15,7 @@ void VertexColorData::set_colorarray(PackedColorArray const &p_colorarray) {
 		rid = RS::get_singleton()->vertexcolordata_create();
 	}
 	RS::get_singleton()->vertexcolordata_set(rid, p_colorarray);
+	emit_changed();
 }
 
 PackedColorArray const & VertexColorData::get_colorarray() {

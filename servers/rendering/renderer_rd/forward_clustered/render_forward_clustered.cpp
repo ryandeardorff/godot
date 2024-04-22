@@ -820,11 +820,14 @@ void RenderForwardClustered::_fill_instance_data(RenderListType p_render_list, i
 			instance_data.vertxcolor_offset = coloroffset;
 			PackedColorArray colors;
 			RS::get_singleton()->vertexcolordata_get(p_vertexcolor, colors);
-			for (Color const &color : colors) {
-				scene_state.vertexcolor_data.push_back(SceneState::VertexColorData{ color });
-				coloroffset+=1;
-			}
-			// coloroffset += RendererRD::MeshStorage::get_singleton()->mesh_surface_get_vertices_drawn_count(surface->surface);
+			// for (Color const &color : colors) {
+			// 	scene_state.vertexcolor_data.push_back(SceneState::VertexColorData{ color });
+			// 	coloroffset+=1;
+			// }
+			scene_state.vertexcolor_data.resize(scene_state.vertexcolor_data.size() + colors.size());
+			SceneState::VertexColorData* dest = scene_state.vertexcolor_data.ptr() + coloroffset;
+			std::memcpy(dest, colors.ptr(), colors.size() * sizeof(Color));
+			coloroffset += colors.size();
 		}
 	}
 
