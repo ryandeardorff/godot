@@ -11,9 +11,6 @@ void VertexColorData::_bind_methods() {
 }
 
 void VertexColorData::set_colorarray(PackedColorArray const &p_colorarray) {
-	if (rid.is_null()) {
-		rid = RS::get_singleton()->vertexcolordata_create();
-	}
 	RS::get_singleton()->vertexcolordata_set(rid, p_colorarray);
 	emit_changed();
 }
@@ -32,4 +29,9 @@ RID VertexColorData::get_rid() const {
 }
 
 VertexColorData::VertexColorData() {
+	rid = RS::get_singleton()->vertexcolordata_create();
+}
+
+VertexColorData::~VertexColorData() {
+	RS::get_singleton()->free(rid);
 }

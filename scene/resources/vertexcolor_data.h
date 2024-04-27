@@ -47,6 +47,7 @@ public:
 	virtual RID get_rid() const override;
 
 	VertexColorData();
+	~VertexColorData();
 };
 
 #endif // VERTEXCOLOR_DATA_H

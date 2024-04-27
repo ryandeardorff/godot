@@ -211,6 +211,7 @@ bool MeshStorage::free(RID p_rid) {
 		return true;
 	} else if (owns_vertexcolordata(p_rid)) {
 		vertexcolordata_free(p_rid);
+		return true;
 	}
 
 	return false;
