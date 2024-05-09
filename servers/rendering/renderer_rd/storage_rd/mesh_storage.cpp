@@ -2280,15 +2280,45 @@ void MeshStorage::_update_dirty_skeletons() {
 	skeleton_dirty_list = nullptr;
 }
 
-RID MeshStorage::vertexcolordata_allocate() {
-	return vertexcolordata_owner.allocate_rid();
+MeshStorage::InstanceVertexColorData & MeshStorage::_get_mesh_instance_vertex_color_data(RID mesh) {
+	if (!instance_vertex_color_data.has(mesh)) {
+		instance_vertex_color_data[mesh] = InstanceVertexColorData();
+		if (!mesh.is_null()) {
+			size_t surf_count = mesh_get_surface_count(mesh);
+			for (size_t surf_index = 0; surf_index < surf_count; ++surf_index) {
+				mesh_get_surface(mesh, surf_index);
+			}
+			instance_vertex_color_data[mesh].stride = 0;
+		}
+	}
+	return instance_vertex_color_data[mesh];
 }
 
-void MeshStorage::vertexcolordata_initialize(RID p_rid) {
-	vertexcolordata_owner.initialize_rid(p_rid);
+void MeshStorage::_instance_vertexcolordata_add_instance(VertexColorData &vertex_color_data) {
+	InstanceVertexColorData& instance_data = _get_mesh_instance_vertex_color_data(vertex_color_data.mesh);
+	// Resize vertexcolors to contain one new element
+	instance_data.vertexcolors.resize(instance_data.vertexcolors.size() + instance_data.stride);
+}
+
+void MeshStorage::_instance_vertexcolordata_remove_instance(VertexColorData &vertex_color_data) {
+	//TODO: instance color data removal logic
+}
+
+void MeshStorage::_instance_vertexcolordata_update_instance(VertexColorData &vertex_color_data) {
+}
+
+RID MeshStorage::vertexcolordata_create(RID mesh) {
+	InstanceVertexColorData & instance_color_data = _get_mesh_instance_vertex_color_data(mesh);
+	RID res = vertexcolordata_owner.make_rid();
+	vertexcolordata_owner.get_or_null(res)->mesh = mesh;
+	return res;
 }
 
 void MeshStorage::vertexcolordata_free(RID p_rid) {
+	VertexColorData * data = vertexcolordata_owner.get_or_null(p_rid);
+	if (data != nullptr) {
+		_instance_vertexcolordata_remove_instance(p_rid);
+	}
 	vertexcolordata_owner.free(p_rid);
 }
 

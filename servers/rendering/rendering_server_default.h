@@ -361,7 +361,7 @@ public:
 	FUNC2(skeleton_set_base_transform_2d, RID, const Transform2D &)
 
 	/* VERTEXCOLOR API */
-	FUNCRIDSPLIT(vertexcolordata)
+	FUNC1R(RID, vertexcolordata_create, RID)
 	FUNC2(vertexcolordata_set, RID, PackedColorArray const&)
 	FUNC2(vertexcolordata_get, RID, PackedColorArray &)
 

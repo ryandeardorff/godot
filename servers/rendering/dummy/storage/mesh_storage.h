@@ -185,8 +185,7 @@ public:
 
 	void occluder_set_mesh(RID p_occluder, const PackedVector3Array &p_vertices, const PackedInt32Array &p_indices) {}
 
-	RID vertexcolordata_allocate() override { return RID(); }
-	void vertexcolordata_initialize(RID p_rid) override { }
+	RID vertexcolordata_create(RID mesh) override { return RID(); }
 	void vertexcolordata_free(RID p_rid) override { }
 	void vertexcolordata_set(RID p_rid, PackedColorArray const &colors) override { }
 	void vertexcolordata_get(RID p_rid, PackedColorArray &colors) override { }

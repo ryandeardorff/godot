@@ -589,9 +589,7 @@ public:
 
 	//TODO: If vertex color is wanted in gles3 this needs to be added
 	// If there's a better way to split functionality across forward+ and gles, this also might be worth swapping to that method.
-	RID vertexcolordata_allocate() override { return RID(); }
-
-	void vertexcolordata_initialize(RID p_rid) override { }
+	RID vertexcolordata_create(RID mesh) override { return RID(); }
 
 	void vertexcolordata_free(RID p_rid) override { }
 

@@ -39,14 +39,18 @@ class VertexColorData : public Resource {
 protected:
 	PackedColorArray colors_cache;
 	RID rid;
+	RID mesh;
 	static void _bind_methods();
 public:
 	void set_colorarray(PackedColorArray const & p_colorarray);
 	PackedColorArray const & get_colorarray();
+	void set_mesh(RID mesh_rid);
+	RID get_mesh();
 
 	virtual RID get_rid() const override;
 
 	VertexColorData();
+	VertexColorData(RID mesh_rid);
 	~VertexColorData();
 };
 

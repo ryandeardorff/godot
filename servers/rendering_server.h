@@ -436,7 +436,7 @@ public:
 	virtual void skeleton_set_base_transform_2d(RID p_skeleton, const Transform2D &p_base_transform) = 0;
 
 	/* VERTEXCOLOR API */
-	virtual RID vertexcolordata_create() = 0;
+	virtual RID vertexcolordata_create(RID mesh) = 0;
 	virtual void vertexcolordata_set(RID p_vertexcolordata, PackedColorArray const & colors) = 0;
 	virtual void vertexcolordata_get(RID p_vertexcolordata, PackedColorArray & colors) = 0;
 

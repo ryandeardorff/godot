@@ -766,16 +766,30 @@ public:
 	}
 
 
+	/* VERTEX COLOR API */
 private:
 	struct VertexColorData {
 		PackedColorArray colors;
+		RID mesh;
+		size_t index;
 	};
+	// The instance vertex color data buffer (and associated buffer info) for each mesh resource
+	struct InstanceVertexColorData {
+		Vector<Color> vertexcolors; // Packed vertexcolors array that is passed to the GPU
+		HashMap<size_t, RID> resources; // maps index in vertexcolors array to a mesh resource ID, used to lookup and update index info when shifting the underlying array
+		size_t stride; // # of verts in mesh corresponds to stride of vertex color data
+	};
+	HashMap<RID, InstanceVertexColorData> instance_vertex_color_data; // maps a mesh resource ID to its corresponding instance vertex color data buffer
 	mutable RID_Owner<VertexColorData,true> vertexcolordata_owner;
+	InstanceVertexColorData& _get_mesh_instance_vertex_color_data(RID mesh);
+	void _instance_vertexcolordata_add_instance(VertexColorData & vertex_color_data);
+	void _instance_vertexcolordata_remove_instance(VertexColorData & vertex_color_data);
+	void _instance_vertexcolordata_update_instance(VertexColorData & vertex_color_data);
+
 public:
 	bool owns_vertexcolordata(RID p_rid) const { return vertexcolordata_owner.owns(p_rid); };
 
-	virtual RID vertexcolordata_allocate() override;
-	void vertexcolordata_initialize(RID p_rid) override;
+	virtual RID vertexcolordata_create(RID mesh) override;
 	void vertexcolordata_free(RID p_rid) override;
 	void vertexcolordata_set(RID p_rid, PackedColorArray const & colors) override;
 	void vertexcolordata_get(RID p_rid, PackedColorArray &out) override;

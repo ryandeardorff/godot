@@ -137,11 +137,12 @@ public:
 
 	/* VERTEXCOLOR API */
 
-	virtual RID vertexcolordata_allocate() = 0;
-	virtual void vertexcolordata_initialize(RID p_rid) = 0;
+	virtual RID vertexcolordata_create(RID mesh) = 0;
 	virtual void vertexcolordata_free(RID p_rid) = 0;
 	virtual void vertexcolordata_set(RID p_rid, PackedColorArray const & colors) = 0;
 	virtual void vertexcolordata_get(RID p_rid, PackedColorArray &out) = 0;
+
+	virtual RID instance_vertexcolordata_buffer_get(RID mesh) = 0;
 };
 
 #endif // MESH_STORAGE_H
